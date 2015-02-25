@@ -90,8 +90,12 @@ angular.module('slick', []).directive('slick', [
               infinite: scope.infinite !== 'false',
               initialSlide: scope.initialSlide || 0,
               lazyLoad: scope.lazyLoad || 'ondemand',
-              onBeforeChange: function (sl) {
-                return scope.onBeforeChange({ $slick: sl });
+              onBeforeChange: function (sl, from, to) {
+                return scope.onBeforeChange({
+                  $slick: sl,
+                  $fromIndex: from,
+                  $toIndex: to
+                });
               },
               onAfterChange: function (sl, index) {
                 if (currentIndex != null) {
