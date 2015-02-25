@@ -90,22 +90,22 @@ angular.module('slick', []).directive('slick', [
               infinite: scope.infinite !== 'false',
               initialSlide: scope.initialSlide || 0,
               lazyLoad: scope.lazyLoad || 'ondemand',
-              onBeforeChange: attrs.onBeforeChange ? scope.onBeforeChange : void 0,
+              onBeforeChange: function (sl) {
+                return scope.onBeforeChange({ $slick: sl });
+              },
               onAfterChange: function (sl, index) {
-                if (attrs.onAfterChange) {
-                  scope.onAfterChange();
-                }
                 if (currentIndex != null) {
-                  return scope.$apply(function () {
+                  scope.$apply(function () {
                     currentIndex = index;
                     return scope.currentIndex = index;
                   });
                 }
+                if (attrs.onAfterChange) {
+                  return scope.onAfterChange();
+                }
               },
               onInit: function (sl) {
-                if (attrs.onInit) {
-                  scope.onInit();
-                }
+                scope.onInit();
                 if (currentIndex != null) {
                   return sl.slideHandler(currentIndex);
                 }
