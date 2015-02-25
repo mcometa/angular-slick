@@ -86,12 +86,13 @@ angular.module('slick', [])
             onBeforeChange: (sl, index) ->
               scope.onBeforeChange($slick: sl, $index: index)
             onAfterChange: (sl, index) ->
-              scope.onAfterChange() if attrs.onAfterChange
               if currentIndex?
                 scope.$apply(->
                   currentIndex = index
                   scope.currentIndex = index
                 )
+              scope.onAfterChange() if attrs.onAfterChange
+
             onInit: (sl) ->
               scope.onInit() if attrs.onInit
               if currentIndex?
@@ -128,7 +129,7 @@ angular.module('slick', [])
           if newVal?
             if isInitialized
               destroySlick()
- 
+
             initializeSlick()
             isInitialized = true
         )
