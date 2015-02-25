@@ -94,7 +94,7 @@ angular.module('slick', [])
               scope.onAfterChange() if attrs.onAfterChange
 
             onInit: (sl) ->
-              scope.onInit() if attrs.onInit
+              scope.onInit()
               if currentIndex?
                 sl.slideHandler(currentIndex)
             onReInit: if attrs.onReInit then scope.onReInit else undefined
