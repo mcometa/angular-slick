@@ -54,14 +54,19 @@ angular.module('slick', [])
       destroySlick = () ->
         $timeout(() ->
           slider = $(element)
-          slider.unslick()
+          slider.slick('unslick')
           slider.find('.slick-list').remove()
           slider
         )
       initializeSlick = () ->
         $timeout(() ->
           slider = $(element)
+
           currentIndex = scope.currentIndex if scope.currentIndex?
+
+          customPaging = (slick, index) ->
+            scope.customPaging({ slick: slick, index: index })
+
           slider.slick
             accessibility: scope.accessibility isnt "false"
             adaptiveHeight: scope.adaptiveHeight is "true"
@@ -74,7 +79,7 @@ angular.module('slick', [])
             centerMode: scope.centerMode is "true"
             centerPadding: scope.centerPadding or "50px"
             cssEase: scope.cssEase or "ease"
-            customPaging: if attrs.customPaging then scope.customPaging else undefined
+            customPaging: if attrs.customPaging then customPaging else undefined
             dots: scope.dots is "true"
             draggable: scope.draggable isnt "false"
             easing: scope.easing or "linear"
@@ -83,20 +88,6 @@ angular.module('slick', [])
             infinite: scope.infinite isnt "false"
             initialSlide:scope.initialSlide or 0
             lazyLoad: scope.lazyLoad or "ondemand"
-            onBeforeChange: (sl, from, to) ->
-              scope.onBeforeChange($slick: sl, $fromIndex: from, $toIndex: to)
-            onAfterChange: (sl, index) ->
-              if currentIndex?
-                scope.$apply(->
-                  currentIndex = index
-                  scope.currentIndex = index
-                )
-              scope.onAfterChange() if attrs.onAfterChange
-
-            onInit: (sl) ->
-              scope.onInit()
-              if currentIndex?
-                sl.slideHandler(currentIndex)
             onReInit: if attrs.onReInit then scope.onReInit else undefined
             onSetPosition: if attrs.onSetPosition then scope.onSetPosition else undefined
             pauseOnHover: scope.pauseOnHover isnt "false"
@@ -117,9 +108,33 @@ angular.module('slick', [])
             nextArrow: if scope.nextArrow then $(scope.nextArrow) else undefined
 
 
+          slider.on 'init', (sl) ->
+            scope.onInit()
+            sl.slideHandler(currentIndex) if currentIndex?
+
+          slider.on 'beforeChange', (event, slick, currentSlide, nextSlide) ->
+            scope.onBeforeChange({
+              $slick: slick,
+              $fromIndex: currentSlide,
+              $toIndex: nextSlide
+            })
+
+          slider.on 'afterChange', (event, slick, currentSlide, nextSlide) ->
+            scope.onAfterChange({
+              $slick: slick,
+              $fromIndex: currentSlide,
+              $toIndex: nextSlide
+            })
+
+            if currentIndex?
+              scope.$apply(->
+                currentIndex = currentSlide
+                scope.currentIndex = currentSlide
+              )
+
           scope.$watch("currentIndex", (newVal, oldVal) ->
             if currentIndex? and newVal? and newVal != currentIndex
-              slider.slickGoTo(newVal)
+              slider.slick('slickGoTo', newVal)
           )
         )
 
